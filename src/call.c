@@ -60,6 +60,8 @@ int trace_function(ftrace_t *data)
     ++data->nb_call;
     static_address = get_static_address(data, call, path);
     name = nm_get_symbol_name(path, static_address);
+    if (name == NULL)
+        name = nm_get_symbol_name(path, call);
     vector_push_back(vectorize(&data->func_names), name);
     fprintf(stderr, "Entering function %s at %#lx\n",
         name ? name : "puts", call);
