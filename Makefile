@@ -56,4 +56,8 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: fclean title all re clean $(NAME)
+tests_run:
+	./tests/test.sh
+
+
+.PHONY: fclean title all re clean tests_run $(NAME)

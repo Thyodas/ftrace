@@ -6,6 +6,7 @@
 */
 
 #include <stdio.h>
+#include <unistd.h>
 
 int bar(int i)
 {
@@ -18,6 +19,7 @@ int foo(void)
 {
     bar(5);
     puts("Hello world!\n");
+    sleep(2);
     return 0;
 }
 
