@@ -94,7 +94,8 @@ int start_ftrace(ftrace_t *data)
             continue;
         trace_execution(data);
     }
-    fprintf(stderr, "Calls: %d, ret: %d\n", data->nb_call, data->nb_ret);
+    if (data->options.detailed)
+        fprintf(stderr, "Calls: %d, ret: %d\n", data->nb_call, data->nb_ret);
     ptrace(PTRACE_DETACH, data->options.pid, 0, 0);
     return 0;
 }
