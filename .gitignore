@@ -9,7 +9,6 @@ coding-style-reports.log
 .idea/
 *.zip
 
-test/
 *dSYM*
 *.gcno
 *.gcda
@@ -35,8 +34,10 @@ testdirectory/
 strace
 miaou
 m32*
+!tests/m32.c
 debug
 *.output
 wolfram
 *.asm
 my_nm
+ftrace
