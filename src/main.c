@@ -14,7 +14,6 @@ int start_ftrace(ftrace_t *data);
 
 int main(int argc, char **argv)
 {
-    argv[0] = "ftrace";
     ftrace_t ftrace = {
         .options = {
             .detailed = false,
@@ -24,7 +23,10 @@ int main(int argc, char **argv)
         },
         .regs = {0},
         .proc_maps = NULL,
+        .nb_call = 0,
+        .nb_ret = 0,
     };
+    vector_init(vectorize(&ftrace.func_names), sizeof(string_t));
     if (parse_args(&ftrace.options, argc, argv))
         return 84;
     if (ftrace.options.help) {

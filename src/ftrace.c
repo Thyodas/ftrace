@@ -17,6 +17,7 @@ char *get_executable(const char *executable_name);
 int print_syscall(ftrace_t *data, struct user_regs_struct *regs);
 void print_signals(int signum);
 int trace_function(ftrace_t *data);
+int trace_function_return(ftrace_t *data);
 
 static int execute_program(ftrace_t *data)
 {
@@ -67,6 +68,8 @@ int trace_execution(ftrace_t *data)
         return 1;
     if (trace_function(data))
         return 1;
+    if (trace_function_return(data))
+        return 1;
     if (data->regs.orig_rax > SYSCALL_NB) {
         return 1;
     }
@@ -91,6 +94,7 @@ int start_ftrace(ftrace_t *data)
             continue;
         trace_execution(data);
     }
+    fprintf(stderr, "Calls: %d, ret: %d\n", data->nb_call, data->nb_ret);
     ptrace(PTRACE_DETACH, data->options.pid, 0, 0);
     return 0;
 }

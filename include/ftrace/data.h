@@ -8,6 +8,7 @@
 #pragma once
 
 #include "options.h"
+#include "vector.h"
 
 #include <sys/ptrace.h>
 #include <sys/user.h>
@@ -25,11 +26,17 @@ typedef union {
     u_int8_t bytes[16];
 } instruction_t;
 
+typedef char * string_t;
+typedef vector_struct(string_t) string_vector_t;
+
 typedef struct {
     ftrace_options_t options;
     struct user_regs_struct regs;
     instruction_t instruction;
     FILE *proc_maps;
+    string_vector_t func_names;
+    int nb_call;
+    int nb_ret;
 } ftrace_t;
 
 #define STR2(x) #x

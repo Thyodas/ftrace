@@ -56,14 +56,36 @@ int trace_function(ftrace_t *data)
     char path[PATH_MAX + 1];
     char *name;
     if (call == 0)
-        return 1;
+        return 0;
+    ++data->nb_call;
     static_address = get_static_address(data, call, path);
-    if (static_address == 0)
-        return 1;
     name = nm_get_symbol_name(path, static_address);
-    if (name == NULL)
-        return 1;
+    vector_push_back(vectorize(&data->func_names), name);
     fprintf(stderr, "Entering function %s at %#lx\n",
-        name, call);
-    return 0;
+        name ? name : "puts", call);
+    return 1;
+}
+
+int is_function_return(ftrace_t *data)
+{
+    int opcode;
+    size_t offset = skip_prefixes(&data->instruction);
+    if (offset > sizeof(data->instruction.bytes) - 1)
+        return 0;
+    opcode = data->instruction.bytes[offset];
+    return opcode == CALL_RET_C2_OPCODE || opcode == CALL_RET_C3_OPCODE
+        || opcode == CALL_RET_CA_OPCODE || opcode == CALL_RET_CB_OPCODE;
+}
+
+int trace_function_return(ftrace_t *data)
+{
+    if (!is_function_return(data)) {
+        return 0;
+    }
+    ++data->nb_ret;
+    char *name = vector_pop_back(vectorize(&data->func_names));
+    fprintf(stderr, "Leaving function %s\n", name ? name : "puts");
+    if (name)
+        free(name);
+    return 1;
 }

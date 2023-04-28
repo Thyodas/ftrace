@@ -21,6 +21,9 @@ SRC = src/main.c 							\
 	  src/nm/symbol/type.c					\
 	  src/nm/ar.c							\
 	  src/nm/file.c							\
+	  src/vector/element.c					\
+	  src/vector/init.c						\
+	  src/vector/save.c						\
 
 OBJ := $(SRC:.c=.o)
 
