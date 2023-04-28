@@ -16,6 +16,7 @@
 char *get_executable(const char *executable_name);
 int print_syscall(ftrace_t *data, struct user_regs_struct *regs);
 void print_signals(int signum);
+int trace_function(ftrace_t *data);
 
 static int execute_program(ftrace_t *data)
 {
@@ -39,11 +40,6 @@ static int execute_program(ftrace_t *data)
     return 0;
 }
 
-/*
-if ((opcode & 0xff) == 0xe8)
-    fprintf(stderr, "Entering function opcode: %lx\n", opcode);
-*/
-
 int trace_signals(int status)
 {
     if (WIFSIGNALED(status)) {
@@ -57,15 +53,24 @@ int trace_signals(int status)
     return 0;
 }
 
-int trace_execution(ftrace_t *data, int status)
+int trace_execution(ftrace_t *data)
 {
-    long opcode = ptrace(PTRACE_PEEKTEXT, data->options.pid, data->regs.rip, 0);
+    int opcode = ptrace(PTRACE_PEEKTEXT, data->options.pid, data->regs.rip, 0);
+    data->instruction.longs[0] = ptrace(PTRACE_PEEKTEXT, data->options.pid,
+        data->regs.rip, 0);
+    data->instruction.longs[1] = ptrace(PTRACE_PEEKTEXT, data->options.pid,
+        data->regs.rip + sizeof(long), NULL);
 
-    if (ptrace_getregs(data->options.pid, &data->regs)
-        || (opcode == -1 && errno != 0) || data->regs.orig_rax > SYSCALL_NB) {
+    if (ptrace_getregs(data->options.pid, &data->regs) ||
+        ((data->instruction.longs[0] == -1 || data->instruction.longs[1] == -1)
+            && errno != 0))
+        return 1;
+    if (trace_function(data))
+        return 1;
+    if (data->regs.orig_rax > SYSCALL_NB) {
         return 1;
     }
-    if (WSTOPSIG(status) == SIGTRAP && (opcode & 0xffff) == 0x050f)
+    if ((data->instruction.longs[0] & 0xffff) == SYSCALL_OPCODE)
         print_syscall(data, &data->regs);
     return 0;
 }
@@ -84,7 +89,7 @@ int start_ftrace(ftrace_t *data)
                         status = ptrace_singlestep(data->options.pid)) {
         if (trace_signals(status))
             continue;
-        trace_execution(data, status);
+        trace_execution(data);
     }
     ptrace(PTRACE_DETACH, data->options.pid, 0, 0);
     return 0;

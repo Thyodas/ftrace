@@ -12,6 +12,15 @@ SRC = src/main.c 							\
 	  src/print.c							\
 	  src/ptrace.c							\
 	  src/signal.c							\
+	  src/call.c							\
+	  src/maps.c							\
+	  src/nm/nm.c							\
+	  src/nm/data.c							\
+	  src/nm/section.c						\
+	  src/nm/symbol/symbol.c				\
+	  src/nm/symbol/type.c					\
+	  src/nm/ar.c							\
+	  src/nm/file.c							\
 
 OBJ := $(SRC:.c=.o)
 

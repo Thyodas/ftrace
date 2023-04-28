@@ -14,6 +14,13 @@
 #include <sys/user.h>
 #include <sys/wait.h>
 
+#define CALL_E8_OPCODE 0xe8
+#define CALL_FF_OPCODE 0xff
+#define CALL_9A_OPCODE 0x9a
+#define SYSCALL_OPCODE 0x050f
+
+#define GET_OPCODE(value) (value & 0xff)
+
 void *ptrace_map_data(pid_t pid, unsigned long address, size_t size,
     size_t offset);
 int ptrace_singlestep(pid_t pid);

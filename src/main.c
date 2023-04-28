@@ -23,6 +23,7 @@ int main(int argc, char **argv)
             .pid = -1,
         },
         .regs = {0},
+        .proc_maps = NULL,
     };
     if (parse_args(&ftrace.options, argc, argv))
         return 84;

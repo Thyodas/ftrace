@@ -38,3 +38,5 @@ m32*
 debug
 *.output
 wolfram
+*.asm
+my_nm
