@@ -13,7 +13,6 @@ SRC = src/main.c 							\
 	  src/ptrace.c							\
 	  src/signal.c							\
 	  src/call.c							\
-	  src/call_utils.c						\
 	  src/maps.c							\
 	  src/nm/nm.c							\
 	  src/nm/data.c							\

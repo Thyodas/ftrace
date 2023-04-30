@@ -17,9 +17,7 @@ typedef struct {
 } sym_64_t;
 
 // src/64/symbol/symbol.c
-int find_static_symbol_by_address_64(data_64_t *data, u_int64_t address);
-int find_dyn_symbol_by_address_64(data_64_t *data, u_int64_t address);
-
+int add_symbol_by_address_64(data_64_t *data, u_int64_t address);
 int cmp_symbol_64(const void *a, const void *b);
 void print_all_symbols_64(data_64_t *data);
 

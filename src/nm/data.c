@@ -25,12 +25,12 @@ char *handle_elf_64(void *file, size_t size, u_int64_t address)
     data.sh_strtab = &data.shdr[data.ehdr->e_shstrndx];
     if (is_out_of_range_64(&data, data.sh_strtab))
         return NULL;
-    find_static_symbol_by_address_64(&data, address);
-    find_dyn_symbol_by_address_64(&data, address);
+    if (add_symbol_by_address_64(&data, address)) {
+        return NULL;
+    }
     if (data.sym_table == NULL || data.sym_len == 0) {
         return NULL;
     }
-    char *name = strdup(data.sym_table[0].name);
     free(data.sym_table);
-    return name;
+    return strdup(data.sym_table[0].name);
 }

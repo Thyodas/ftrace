@@ -27,7 +27,7 @@ static int open_proc_maps(ftrace_t *data)
     return 0;
 }
 
-u_int64_t get_elf_address(ftrace_t *data, u_int64_t runtime_address,
+u_int64_t get_static_address(ftrace_t *data, u_int64_t runtime_address,
     char *path)
 {
     if (open_proc_maps(data))

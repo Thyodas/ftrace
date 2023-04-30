@@ -37,7 +37,6 @@ typedef struct {
     string_vector_t func_names;
     int nb_call;
     int nb_ret;
-    bool last_was_plt_call;
 } ftrace_t;
 
 #define STR2(x) #x
