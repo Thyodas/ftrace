@@ -32,7 +32,7 @@ static void add_symbol_to_list(data_64_t *data, Elf64_Sym *sym, char *name)
     ++data->sym_len;
 }
 
-int add_symbol_by_address_64(data_64_t *data, u_int64_t address)
+int find_static_symbol_by_address_64(data_64_t *data, u_int64_t address)
 {
     Elf64_Shdr *symtab = get_shdr_by_type_64(data, SHT_SYMTAB);
     if (symtab == NULL)
@@ -52,14 +52,48 @@ int add_symbol_by_address_64(data_64_t *data, u_int64_t address)
     return 0;
 }
 
-void print_all_symbols_64(data_64_t *data)
+/*
+int find_dyn_symbol_by_address_64(data_64_t *data, u_int64_t address)
 {
-    for (size_t i = 0 ; i < data->sym_len ; ++i) {
-        if (data->sym_table[i].sym->st_shndx == SHN_UNDEF)
-            printf("                 %c %s\n", data->sym_table[i].type,
-                data->sym_table[i].name);
-        else
-            printf("%016lx %c %s\n", data->sym_table[i].value,
-                data->sym_table[i].type, data->sym_table[i].name);
+    Elf64_Shdr *dynsym_tab = get_shdr_by_type_64(data, SHT_DYNSYM);
+    if (dynsym_tab == NULL)
+        return 1;
+    Elf64_Shdr *dynsym_strtab = &data->shdr[dynsym_tab->sh_link];
+    if (is_out_of_range_64(data, dynsym_strtab))
+        return 1;
+    Elf64_Sym *sym = (Elf64_Sym *) (data->file + dynsym_tab->sh_offset);
+    char *str = (char *) (data->file + dynsym_strtab->sh_offset);
+    if (is_out_of_range_64(data, sym) || is_out_of_range_64(data, str))
+        return 1;
+    for (Elf64_Word i = 1 ; i < dynsym_tab->sh_size / sizeof(Elf64_Sym) ; i++) {
+        if (sym[i].st_value != address)
+            continue;
+        add_symbol_to_list(data, &sym[i], str + sym[i].st_name);
     }
+    return 0;
+}
+*/
+
+int find_dyn_symbol_by_address_64(data_64_t *data, u_int64_t address)
+{
+    Elf64_Shdr *rela_plt = get_shdr_by_name_64(data, ".rela.plt");
+    if (rela_plt == NULL)
+        return 1;
+    Elf64_Rela *rela = (Elf64_Rela *) (data->file + rela_plt->sh_offset);
+    Elf64_Shdr *dynsym = get_shdr_by_type_64(data, SHT_DYNSYM);
+    if (dynsym == NULL) return 1;
+    Elf64_Shdr *dynsym_strtab = &data->shdr[dynsym->sh_link];
+    if (is_out_of_range_64(data, dynsym_strtab)) return 1;
+    Elf64_Sym *sym = (Elf64_Sym *) (data->file + dynsym->sh_offset);
+    char *str = (char *) (data->file + dynsym_strtab->sh_offset);
+    if (is_out_of_range_64(data, sym) || is_out_of_range_64(data, str))
+        return 1;
+    for (Elf64_Word i = 0 ; i < rela_plt->sh_size / sizeof(Elf64_Rela) ; i++) {
+        if (rela[i].r_offset == address) {
+            Elf64_Word sym_index = ELF64_R_SYM(rela[i].r_info);
+            add_symbol_to_list(data, &sym[sym_index],
+                str + sym[sym_index].st_name);
+        }
+    }
+    return 0;
 }

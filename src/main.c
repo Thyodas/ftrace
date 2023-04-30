@@ -21,10 +21,8 @@ int main(int argc, char **argv)
             .command = NULL,
             .pid = -1,
         },
-        .regs = {0},
-        .proc_maps = NULL,
-        .nb_call = 0,
-        .nb_ret = 0,
+        .regs = {0}, .proc_maps = NULL, .nb_call = 0, .nb_ret = 0,
+        .last_was_plt_call = false,
     };
     vector_init(vectorize(&ftrace.func_names), sizeof(string_t));
     if (parse_args(&ftrace.options, argc, argv))

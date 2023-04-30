@@ -18,6 +18,11 @@
 #define CALL_FF_OPCODE 0xff
 #define CALL_9A_OPCODE 0x9a
 
+#define JMP_EB_OPCODE 0xeb
+#define JMP_FF_OPCODE 0xff
+#define JMP_E9_OPCODE 0xe9
+#define JMP_EA_OPCODE 0xea
+
 #define CALL_RET_C3_OPCODE 0xc3
 #define CALL_RET_CB_OPCODE 0xcb
 #define CALL_RET_C2_OPCODE 0xc2
